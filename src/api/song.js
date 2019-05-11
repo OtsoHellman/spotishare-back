@@ -5,7 +5,28 @@ const router = express.Router()
 
 const { songQueue } = require('../playbackController')
 
-router.post('/', (req, res) => res.json(songQueue.push(req.body.songId)))
+router.post('/', (req, res) => {
+
+    if (req.body.songId.slice(0, 14) === "spotify:track:") {
+        return spotify.getSongById(req.body.songId.slice(14))
+            .then(responseObject => {
+                if (responseObject.statusCode === 200) {
+                    return res.json(songQueue.push(req.body.songId))
+                } else {
+                    return res.send('Song id not found', 400)
+                }
+            })
+            .catch(err => res.send(err))
+    } else {
+        return res.send('Invalid input', 400)
+    }
+
+})
+
+router.get('/', (req, res) => {
+    return res.json(songQueue)
+})
+
 
 
 module.exports = router
