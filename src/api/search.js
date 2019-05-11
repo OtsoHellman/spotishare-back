@@ -3,8 +3,8 @@ const spotify = require('../spotify')
 
 const router = express.Router()
 
-router.get('/', (req, res) => {
-    const query = req.body.query
+router.get('/:query', (req, res) => {
+    const query = req.params.query
     if (!query) {
         return res.send('Missing query parameter', 400)
     }
