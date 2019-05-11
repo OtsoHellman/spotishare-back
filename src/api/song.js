@@ -24,14 +24,17 @@ router.post('/', (req, res) => {
 
 router.post('/removeNext', (req, res) => {
     if (songQueue.length > 0) {
-        songQueue.shift()
+        return res.json(songQueue.shift())
     }
+    return res.send('Whats the correct status code', 400)
 })
 
 router.post('/next', (req, res) => {
     if (songQueue.length > 0) {
         playNextSong()
+            .then(res.send(200))
     }
+    return res.send('Whats the correct status code', 400)
 })
 
 router.get('/', (req, res) => {
