@@ -19,6 +19,5 @@ exports.playSongById = (songId) => {
 }
 
 exports.getSongById = (songId) => {
-  console.log(songId)
-  return spotifyApi.getTrack(songId)
+    return spotifyApi.getTrack(songId)
 }

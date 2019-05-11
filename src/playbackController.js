@@ -1,10 +1,10 @@
 const spotify = require('./spotify')
 
-const songQueue = ['spotify:track:2yX4sEiEilccgu4Yk0ljvJ']
+const songQueue = []
 let playbackInterval
 
 const playNextSong = () => {
-    const nextSongId = songQueue.shift()
+    const nextSongId = songQueue.shift().uri
     return spotify.playSongById(nextSongId)
         .catch(err => console.log(err.message))
         .then(startInterval())
@@ -19,7 +19,6 @@ const pollPlayback = () => spotify.getPlaybackState()
             clearInterval(playbackInterval)
             playNextSong()
         }
-        console.log(songQueue)
     })
     .catch(err => console.log(err.message))
 

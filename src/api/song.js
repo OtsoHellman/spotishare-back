@@ -11,7 +11,7 @@ router.post('/', (req, res) => {
         return spotify.getSongById(req.body.songId.slice(14))
             .then(responseObject => {
                 if (responseObject.statusCode === 200) {
-                    return res.json(songQueue.push(req.body.songId))
+                    return res.json(songQueue.push(responseObject.body))
                 } else {
                     return res.send('Song id not found', 400)
                 }
