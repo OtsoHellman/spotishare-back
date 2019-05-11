@@ -1,20 +1,32 @@
 const express = require('express')
-const SpotifyWebApi = require('spotify-web-api-node')
+const spotify = require('../spotify')
 
 const router = express.Router()
 
-const spotifyApi = new SpotifyWebApi({
-  clientId: process.env.CLIENTID,
-  clientSecret: process.env.CLIENTSECRET,
-  redirectUri: process.env.REDIRECTURI
+const { songQueue } = require('../playbackController')
+
+router.post('/', (req, res) => {
+
+    if (req.body.songId.slice(0, 14) === "spotify:track:") {
+        return spotify.getSongById(req.body.songId.slice(14))
+            .then(responseObject => {
+                if (responseObject.statusCode === 200) {
+                    return res.json(songQueue.push(responseObject.body))
+                } else {
+                    return res.send('Song id not found', 400)
+                }
+            })
+            .catch(err => res.send(err))
+    } else {
+        return res.send('Invalid input', 400)
+    }
+
 })
 
-const songQueue = []
+router.get('/', (req, res) => {
+    return res.json(songQueue)
+})
 
-spotifyApi.setAccessToken(process.env.ACCESSTOKEN)
-
-// add song to queue
-router.post('/', (req, res) => res.json(songQueue.push(req.body.songId)))
 
 
 module.exports = router
