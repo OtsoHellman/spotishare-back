@@ -24,7 +24,7 @@ const pollPlayback = () => spotify.getPlaybackState()
     .catch(err => console.log(err.message))
 
 const startInterval = () => {
-    playbackInterval = setInterval(() => pollPlayback(), 3000)
+    playbackInterval = setInterval(() => pollPlayback(), 2000)
 }
 
 exports.songQueue = songQueue
