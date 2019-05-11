@@ -7,7 +7,7 @@ const playNextSong = () => {
     const nextSongId = songQueue.shift().uri
     return spotify.playSongById(nextSongId)
         .catch(err => console.log(err.message))
-        .then(startInterval())
+
 }
 
 const pollPlayback = () => spotify.getPlaybackState()
@@ -18,6 +18,7 @@ const pollPlayback = () => spotify.getPlaybackState()
         if (duration - progress < 6000 && songQueue.length > 0) {
             clearInterval(playbackInterval)
             playNextSong()
+                .then(startInterval())
         }
     })
     .catch(err => console.log(err.message))
