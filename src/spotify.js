@@ -1,23 +1,34 @@
 const SpotifyWebApi = require('spotify-web-api-node')
+const config = require('./config')
 
 const spotifyApi = new SpotifyWebApi({
-  clientId: process.env.CLIENTID,
-  clientSecret: process.env.CLIENTSECRET,
-  redirectUri: process.env.REDIRECTURI
+  clientId: config.clientId,
+  clientSecret: config.clientSecret,
+  redirectUri: config.redirectUri
 })
 
-exports.initialize = () => {
-  spotifyApi.setAccessToken(process.env.ACCESSTOKEN)
+getNewAccessToken = () => {
+  spotifyApi.refreshAccessToken().then(
+    function(data) {
+      console.log('The access token has been refreshed!')
+      spotifyApi.setAccessToken(data.body['access_token'])
+    },
+    function(err) {
+      console.log('Could not refresh access token', err)
+    }
+  )
+}
+exports.initialize = (accessToken, refreshToken) => {
+  console.log(refreshToken)
+  spotifyApi.setAccessToken(accessToken)
+  spotifyApi.setRefreshToken(refreshToken)
+  setInterval(() => getNewAccessToken(), 300000)
 }
 
 exports.getPlaybackState = () => {
   return spotifyApi.getMyCurrentPlaybackState()
 }
 
-exports.playSongById = (songId) => {
-  return spotifyApi.play({"uris": [songId]})
-}
+exports.playSongById = (songId) => (spotifyApi.play({"uris": [songId]}))
 
-exports.getSongById = (songId) => {
-    return spotifyApi.getTrack(songId)
-}
+exports.getSongById = (songId) => (spotifyApi.getTrack(songId))
