@@ -17,3 +17,8 @@ exports.getPlaybackState = () => {
 exports.playSongById = (songId) => {
   return spotifyApi.play({"uris": [songId]})
 }
+
+exports.getSongById = (songId) => {
+  console.log(songId)
+  return spotifyApi.getTrack(songId)
+}
