@@ -22,7 +22,7 @@ exports.initialize = (accessToken, refreshToken) => {
   console.log(refreshToken)
   spotifyApi.setAccessToken(accessToken)
   spotifyApi.setRefreshToken(refreshToken)
-  setInterval(() => getNewAccessToken(), 300000)
+  setInterval(() => getNewAccessToken(), 3000000)
 }
 
 exports.searchByQuery = (query) => {
