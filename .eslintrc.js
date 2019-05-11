@@ -7,5 +7,6 @@ module.exports = {
         'no-return-assign': 0,
         camelcase: 0,
         semi: 0,
+        'no-console': 'off',
     }
 };
