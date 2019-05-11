@@ -10,6 +10,7 @@ require('dotenv').config()
 
 const middlewares = require('./middlewares')
 const song = require('./api/song')
+const search = require('./api/search')
 
 const app = express()
 
@@ -20,6 +21,7 @@ app.use(bodyParser.json())
 
 
 app.use('/api/song', song)
+app.use('/api/search', search)
 
 app.use(middlewares.notFound)
 app.use(middlewares.errorHandler)

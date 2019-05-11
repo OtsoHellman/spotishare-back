@@ -25,10 +25,18 @@ exports.initialize = (accessToken, refreshToken) => {
   setInterval(() => getNewAccessToken(), 300000)
 }
 
+exports.searchByQuery = (query) => {
+  return spotifyApi.searchTracks(query)
+}
+
 exports.getPlaybackState = () => {
   return spotifyApi.getMyCurrentPlaybackState()
 }
 
-exports.playSongById = (songId) => (spotifyApi.play({"uris": [songId]}))
+exports.playSongById = (songId) => {
+  return spotifyApi.play({ "uris": [songId] })
+}
 
-exports.getSongById = (songId) => (spotifyApi.getTrack(songId))
+exports.getSongById = (songId) => {
+  return spotifyApi.getTrack(songId)
+}
