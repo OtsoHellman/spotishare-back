@@ -5,7 +5,7 @@ let playbackInterval
 
 const playNextSong = () => {
     const nextSongId = songQueue.shift()
-    spotify.playSongById(nextSongId)
+    return spotify.playSongById(nextSongId)
         .catch(err => console.log(err.message))
         .then(startInterval())
 }
