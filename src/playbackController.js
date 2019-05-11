@@ -15,7 +15,7 @@ const pollPlayback = () => spotify.getPlaybackState()
         const progress = res.body.progress_ms
         const duration = res.body.item.duration_ms
 
-        if (duration - progress < 4000 && songQueue.length > 0) {
+        if (duration - progress < 6000 && songQueue.length > 0) {
             clearInterval(playbackInterval)
             playNextSong()
         }
@@ -24,7 +24,7 @@ const pollPlayback = () => spotify.getPlaybackState()
     .catch(err => console.log(err.message))
 
 const startInterval = () => {
-    playbackInterval = setInterval(() => pollPlayback(), 2000)
+    playbackInterval = setInterval(() => pollPlayback(), 3000)
 }
 
 exports.songQueue = songQueue
