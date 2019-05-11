@@ -29,3 +29,4 @@ const startInterval = () => {
 
 exports.songQueue = songQueue
 exports.startInterval = startInterval
+exports.playNextSong = playNextSong
