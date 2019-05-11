@@ -1,6 +1,6 @@
 const spotify = require('./spotify')
 
-const songQueue = ['spotify:track:4iV5W9uYEdYUVa79Axb7Rh']
+const songQueue = ['spotify:track:2yX4sEiEilccgu4Yk0ljvJ']
 let playbackInterval
 
 const playNextSong = () => {
