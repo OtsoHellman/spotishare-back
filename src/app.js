@@ -26,8 +26,5 @@ app.use('/api/search', search)
 app.use(middlewares.notFound)
 app.use(middlewares.errorHandler)
 
-playbackController.startInterval()
-spotify.initialize()
-
 
 module.exports = app
