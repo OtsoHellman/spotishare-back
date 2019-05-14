@@ -9,17 +9,16 @@ const spotifyApi = new SpotifyWebApi({
 
 getNewAccessToken = () => {
   spotifyApi.refreshAccessToken().then(
-    function(data) {
+    function (data) {
       console.log('The access token has been refreshed!')
       spotifyApi.setAccessToken(data.body['access_token'])
     },
-    function(err) {
+    function (err) {
       console.log('Could not refresh access token', err)
     }
   )
 }
 exports.initialize = (accessToken, refreshToken) => {
-  console.log(refreshToken)
   spotifyApi.setAccessToken(accessToken)
   spotifyApi.setRefreshToken(refreshToken)
   setInterval(() => getNewAccessToken(), 3000000)
