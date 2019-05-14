@@ -14,7 +14,7 @@ const pollPlayback = () => spotify.getPlaybackState()
     .then(res => {
         const progress = res.body.progress_ms
         const duration = res.body.item.duration_ms
-
+        console.log(`Listening on ${res.body.device.name}: ${res.body.device.type}`)
         if (duration - progress < 6000 && songQueue.length > 0) {
             clearInterval(playbackInterval)
             playNextSong()
