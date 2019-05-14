@@ -7,7 +7,6 @@ const playbackController = require('./playbackController')
 const middlewares = require('./middlewares')
 const song = require('./api/song')
 const search = require('./api/search')
-const spotify = require('./spotify')
 const config = require('./config')
 const request = require('request')
 
@@ -41,8 +40,7 @@ app.get('/ok', (req, res) => {
         }
     }, (error, response, body) => {
         const data = JSON.parse(body)
-        spotify.initialize(data.access_token, data.refresh_token)
-        playbackController.startInterval()
+        playbackController.addHost(data.access_token, data.refresh_token)
         res.sendStatus(200)
     })
 })

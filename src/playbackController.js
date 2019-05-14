@@ -1,37 +1,14 @@
-const spotify = require('./spotify')
+const { Playback } = require('./playback')
 
-const songQueue = []
-let playbackInterval = false
+const activeHosts = []
 
-const playNextSong = () => {
-    const nextSongId = songQueue.shift().uri
-    console.log("Playing next song")
-    return spotify.playSongById(nextSongId)
-        .catch(err => console.log(err.message))
+exports.addHost = (accessToken, refreshToken) => {
+    activeHosts.push(new Playback(accessToken, refreshToken))
 }
 
-const deactivateInterval = () => {
-    clearInterval(playbackInterval)
-    playbackInterval = false
+exports.getHosts = () => activeHosts.map(host => host.hostName)
+
+exports.getHostByName = (hostName) => {
+    const filteredHosts = activeHosts.filter(host => host.hostName === hostName)
+    return filteredHosts.length > 0 ? filteredHosts[0] : null
 }
-
-const pollPlayback = () => spotify.getPlaybackState()
-    .then(res => {
-        const progress = res.body.progress_ms
-        const duration = res.body.item.duration_ms
-        console.log(`Listening to ${res.body.item.name} on ${res.body.device.name}(${res.body.device.type}). Next song in ${parseInt((duration - progress) / 1000) - 3}s`)
-        if (duration - progress < 3000 && songQueue.length > 0 && playbackInterval) {
-            deactivateInterval(playbackInterval)
-            playNextSong()
-                .then(startInterval())
-        }
-    })
-    .catch(err => console.log(err.message))
-
-const startInterval = () => {
-    playbackInterval = setInterval(() => pollPlayback(), 1000)
-}
-
-exports.songQueue = songQueue
-exports.startInterval = startInterval
-exports.playNextSong = playNextSong

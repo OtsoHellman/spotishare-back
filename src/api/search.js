@@ -1,14 +1,24 @@
 const express = require('express')
-const spotify = require('../spotify')
+const { getHosts, getHostByName } = require('../playbackController')
 
 const router = express.Router()
 
 router.get('/', (req, res) => {
-    const query = req.query.searchQuery
-    if (!query) {
-        return res.send('Missing query parameter', 400)
+    if (!req.query.hostName) {
+        return res.status(400).send('Missing hostName')
     }
-    return spotify.searchByQuery(query)
+
+    const host = getHostByName(req.query.hostName)
+
+    if (!host) {
+        return res.status(400).send('Invalid hostName')
+    }
+
+    if (!req.query.searchQuery) {
+        return res.status(400).send('Missing query parameter')
+    }
+
+    return host.spotifyApi.searchByQuery(req.query.searchQuery)
         .then(responseObject => res.json(responseObject))
         .catch(err => res.send(err))
 })
