@@ -35,5 +35,8 @@
     "nodemon": "^1.18.9",
     "snyk": "^1.163.3",
     "supertest": "^3.3.0"
+  },
+  "engines": {
+    "node": "12.x"
   }
 }
