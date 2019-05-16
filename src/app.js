@@ -40,8 +40,8 @@ app.get('/ok', (req, res) => {
         }
     }, (error, response, body) => {
         const data = JSON.parse(body)
-        playbackController.addHost(data.access_token, data.refresh_token)
-        res.sendStatus(200)
+        const hash = playbackController.addHost(data.access_token, data.refresh_token)
+        res.redirect(config.frontUri+hash) 
     })
 })
 

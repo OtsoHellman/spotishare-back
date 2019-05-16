@@ -1,12 +1,13 @@
 const { SpotifyApi } = require('./spotify')
 
 exports.Playback = class Playback {
-    constructor(accessToken, refreshToken) {
+    constructor(accessToken, refreshToken, hash) {
         this.songQueue = []
         this.playbackInterval = false
         this.spotifyApi = new SpotifyApi(accessToken, refreshToken)
+        this.hash = hash
         this.startInterval()
-
+        
         this.spotifyApi.getUserInfo()
             .then(data => this.hostName = data.body.display_name)
             .catch(err => console.log(err))

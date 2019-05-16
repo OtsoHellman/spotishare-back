@@ -2,17 +2,17 @@ const express = require('express')
 
 const router = express.Router()
 
-const { getHostByName } = require('../playbackController')
+const { getHostByHash } = require('../playbackController')
 
-router.post('/', (req, res) => {
-    if (!req.body.hostName) {
-        return res.send('Missing hostName', 400)
+router.post('/:hash', (req, res) => {
+    if (!req.params.hash) {
+        return res.send('Missing hash', 400)
     }
 
-    const host = getHostByName(req.body.hostName)
+    const host = getHostByHash(req.params.hash)
 
     if (!host) {
-        return res.status(400).send('Invalid hostName')
+        return res.status(400).send('Invalid hash')
     }
 
     if (req.body.songId.slice(0, 14) === "spotify:track:") {
@@ -31,15 +31,15 @@ router.post('/', (req, res) => {
 
 })
 
-router.post('/removeNext', (req, res) => {
-    if (!req.body.hostName) {
-        return res.send('Missing hostName', 400)
+router.post('/removeNext/:hash', (req, res) => {
+    if (!req.params.hash) {
+        return res.send('Missing hash', 400)
     }
 
-    const host = getHostByName(req.body.hostName)
+    const host = getHostByHash(req.params.hash)
 
     if (!host) {
-        return res.status(400).send('Invalid hostName')
+        return res.status(400).send('Invalid hash')
     }
 
     if (host.songQueue.length > 0) {
@@ -48,15 +48,15 @@ router.post('/removeNext', (req, res) => {
     return res.send('Whats the correct status code', 400)
 })
 
-router.post('/next', (req, res) => {
-    if (!req.body.hostName) {
-        return res.send('Missing hostName', 400)
+router.post('/next/:hash', (req, res) => {
+    if (!req.params.hash) {
+        return res.send('Missing hash', 400)
     }
 
-    const host = getHostByName(req.body.hostName)
+    const host = getHostByHash(req.params.hash)
 
     if (!host) {
-        return res.status(400).send('Invalid hostName')
+        return res.status(400).send('Invalid hash')
     }
 
     if (host.songQueue.length > 0) {
@@ -66,16 +66,16 @@ router.post('/next', (req, res) => {
     return res.send('Whats the correct status code', 400)
 })
 
-router.get('/', (req, res) => {
+router.get('/:hash', (req, res) => {
 
-    if (!req.query.hostName) {
-        return res.status(400).send('Missing hostName')
+    if (!req.params.hash) {
+        return res.status(400).send('Missing hash')
     }
 
-    const host = getHostByName(req.query.hostName)
+    const host = getHostByHash(req.params.hash)
 
     if (!host) {
-        return res.status(400).send('Invalid hostName')
+        return res.status(400).send('Invalid hash')
     }
 
     return res.json(host.songQueue)
@@ -83,14 +83,14 @@ router.get('/', (req, res) => {
 
 /* needs to be refactored to use class based playback
 router.post('/move', (req, res) => {
-   if (!req.query.hostName) {
-       return res.send('Missing hostName', 400)
+   if (!req.params.hash) {
+       return res.send('Missing hash', 400)
    }
 
-   const host = getHostByName(req.query.hostName)
+   const host = getHostByHash(req.params.hash)
    
    if (!host) {
-       return res.status(400).send('Invalid hostName')
+       return res.status(400).send('Invalid hash')
    }
 
    const { songId, moveUp } = req.body

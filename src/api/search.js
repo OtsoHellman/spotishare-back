@@ -1,17 +1,17 @@
 const express = require('express')
-const { getHosts, getHostByName } = require('../playbackController')
+const { getHostByHash } = require('../playbackController')
 
 const router = express.Router()
 
-router.get('/', (req, res) => {
-    if (!req.query.hostName) {
-        return res.status(400).send('Missing hostName')
+router.get('/:hash', (req, res) => {
+    if (!req.params.hash) {
+        return res.status(400).send('Missing hash')
     }
 
-    const host = getHostByName(req.query.hostName)
+    const host = getHostByHash(req.params.hash)
 
     if (!host) {
-        return res.status(400).send('Invalid hostName')
+        return res.status(400).send('Invalid hash')
     }
 
     if (!req.query.searchQuery) {
