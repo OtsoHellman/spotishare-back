@@ -27,6 +27,7 @@ exports.Playback = class Playback {
         const nextSongId = this.songQueue.shift().uri
         console.log("Playing next song")
         return this.spotifyApi.playSongById(nextSongId)
+            .then(() => new Promise(resolve => setTimeout(resolve, 3000)))
             .catch(err => console.log(err.message))
     }
 
