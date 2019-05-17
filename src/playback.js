@@ -30,30 +30,30 @@ exports.Playback = class Playback {
             .catch(err => console.log(err.message))
     }
 
-    deactivateInterval = () => {
-        console.log("deactivating interval")
-        clearInterval(this.playbackInterval)
-        this.playbackInterval = false
-    }
-
     pollPlayback = () => this.spotifyApi.getPlaybackState()
         .then(res => {
-            const progress = res.body.progress_ms
-            const duration = res.body.item.duration_ms
-            console.log(`Listening to ${res.body.item.name} on ${res.body.device.name}(${res.body.device.type}). Next song in ${parseInt((duration - progress) / 1000) - 3}s`)
+            const remainingDuration = res.body.item.duration_ms - res.body.progress_ms
+            console.log(`Listening to ${res.body.item.name} on ${res.body.device.name}(${res.body.device.type}). Next song in ${parseInt(remainingDuration / 1000) - 3}s`)
             console.log(`Songs still in queue: ${this.songQueue.map(song => "\n" + song.name)}`)
-            if (duration - progress < 3000 && this.songQueue.length > 0 && this.playbackInterval) {
+            if (remainingDuration < 3000 && this.songQueue.length > 0) {
                 console.log("Duration < 3s")
-                this.deactivateInterval()
-                this.playNextSong()
-                    .then(this.startInterval())
+                return this.playNextSong()
             }
         })
         .catch(err => console.log(err.message))
 
     startInterval = () => {
         console.log("starting interval")
-        this.playbackInterval = setInterval(() => this.pollPlayback(), 1000)
+        this.playbackInterval = true
+        const interval = () => {
+            if (this.playbackInterval) {
+                Promise.all([
+                    this.pollPlayback(),
+                    new Promise((resolve) => setTimeout(resolve, 1000))
+                ]).then(interval)
+            }
+        }
+        interval()
     }
 }
 
