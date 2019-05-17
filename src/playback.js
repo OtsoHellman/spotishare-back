@@ -7,6 +7,7 @@ exports.Playback = class Playback {
         this.spotifyApi = new SpotifyApi(accessToken, refreshToken)
         this.hash = hash
         this.startInterval()
+        this.currentSong = null
 
         this.spotifyApi.getUserInfo()
             .then(data => this.hostName = data.body.display_name)
@@ -33,6 +34,7 @@ exports.Playback = class Playback {
 
     pollPlayback = () => this.spotifyApi.getPlaybackState()
         .then(res => {
+            this.currentSong = res.body.item
             const remainingDuration = res.body.item.duration_ms - res.body.progress_ms
             console.log(`Listening to ${res.body.item.name} on ${res.body.device.name}(${res.body.device.type}). Next song in ${parseInt(remainingDuration / 1000) - 3}s`)
             console.log(`Songs still in queue: ${this.songQueue.map(song => "\n" + song.name)}`)

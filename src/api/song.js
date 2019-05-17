@@ -81,6 +81,21 @@ router.get('/:hash', (req, res) => {
     return res.json(host.songQueue)
 })
 
+router.get('/current/:hash', (req, res) => {
+
+    if (!req.params.hash) {
+        return res.status(400).send('Missing hash')
+    }
+
+    const host = getHostByHash(req.params.hash)
+
+    if (!host) {
+        return res.status(400).send('Invalid hash')
+    }
+
+    return res.json(host.currentSong)
+})
+
 /* needs to be refactored to use class based playback
 router.post('/move', (req, res) => {
    if (!req.params.hash) {
