@@ -93,7 +93,10 @@ router.get('/current/:hash', (req, res) => {
         return res.status(400).send('Invalid hash')
     }
 
-    return res.json(host.currentSong)
+    return res.json({
+        song: host.currentSong,
+        progress: host.currentProgress
+    })
 })
 
 /* needs to be refactored to use class based playback
