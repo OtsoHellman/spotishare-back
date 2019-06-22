@@ -26,9 +26,11 @@ exports.SpotifyApi = class SpotifyApi {
 
   playSongById = (songId) => this.spotifyWebApi.play({ "uris": [songId] })
 
+  playSongByContext = (context) => this.spotifyWebApi.play({ "context_uri": context.uri })
+
+  setShuffle = () => this.spotifyWebApi.setShuffle({ "state": true })
+
   getSongById = (songId) => this.spotifyWebApi.getTrack(songId)
 
   getUserInfo = () => this.spotifyWebApi.getMe()
 }
-
-

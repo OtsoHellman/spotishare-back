@@ -9,6 +9,7 @@ exports.Playback = class Playback {
         this.startInterval()
         this.currentSong = null
         this.currentProgress = 0
+        this.savedContext = null
 
         this.spotifyApi.getUserInfo()
             .then(data => this.hostName = data.body.display_name)
@@ -33,16 +34,33 @@ exports.Playback = class Playback {
             .catch(err => console.log(err.message))
     }
 
+    playSavedContext = () => {
+        console.log("Playing by saved context")
+        console.log(this.savedContext)
+        return this.spotifyApi.setShuffle()
+            .then(this.spotifyApi.playSongByContext(this.savedContext))
+            .then(() => new Promise(resolve => setTimeout(resolve, 3000)))
+            .catch(err => console.log(err.message))
+    }
+
     pollPlayback = () => this.spotifyApi.getPlaybackState()
         .then(res => {
+            if (res.body.context) {
+                this.savedContext = res.body.context
+            }
             this.currentSong = res.body.item
             this.currentProgress = res.body.progress_ms
             const remainingDuration = res.body.item.duration_ms - res.body.progress_ms
             console.log(`Listening to ${res.body.item.name} on ${res.body.device.name}(${res.body.device.type}). Next song in ${parseInt(remainingDuration / 1000) - 3}s`)
             console.log(`Songs still in queue: ${this.songQueue.map(song => "\n" + song.name)}`)
-            if (remainingDuration < 3000 && this.songQueue.length > 0) {
+            if (remainingDuration < 3000) {
                 console.log("Duration < 3s")
-                return this.playNextSong()
+                if (this.songQueue.length > 0) {
+                    return this.playNextSong()
+                }
+                if (!res.body.context && this.savedContext) {
+                    return this.playSavedContext()
+                }
             }
         })
         .catch(err => console.log(err.message))
