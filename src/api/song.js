@@ -19,6 +19,9 @@ router.post('/:hash', (req, res) => {
         return host.spotifyApi.getSongById(req.body.songId.slice(14))
             .then(responseObject => {
                 if (responseObject.statusCode === 200) {
+                    if (host.songQueue.includes(responseObject.body)) {
+                        return res.send('Hyvää juhannusta', 418)
+                    }
                     return res.json(host.addSong(responseObject.body))
                 } else {
                     return res.send('Song id not found', 400)
