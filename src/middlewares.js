@@ -21,17 +21,36 @@ function errorHandler(err, req, res, next) {
 
 function authentication(req, res, next) {
   try {
+    // check if access token is included in cookies
     if (!req.spotishare.access_token) {
-      console.log("perse")
       const err = new Error("Not authorized");
       err.status = 400;
       return next(err);
     }
 
+    // check if access token in cache
     if (cache.get(req.spotishare.access_token)) {
       return next()
     }
-    console.log("moro")
+
+    // check if access token is valid
+    request.get({
+      uri: 'https://api.spotify.com/v1/me',
+      headers: {
+        'Authorization': `Bearer ${req.spotishare.access_token}`
+      }
+    }, (error, response, body) => {
+      if (response.statusCode === 200) {
+        cache.put(req.spotishare.access_token, true, 900000)
+        return next()
+      } else {
+        const err = new Error("Invalid access token");
+        err.status = 400;
+        return next(err);
+      }
+    })
+
+    // try to request valid access token
     request.post({
       uri: 'https://accounts.spotify.com/api/token',
       headers: {

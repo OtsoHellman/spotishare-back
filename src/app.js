@@ -22,9 +22,7 @@ app.use(session({
     secret: 'lihapulle'
 }))
 app.use(cookieParser())
-app.use(middlewares.authentication)
 
-app.use('/api/song', song)
 
 app.get('/login', (req, res) => {
     const scopes = 'user-modify-playback-state user-read-playback-state';
@@ -45,10 +43,17 @@ app.get('/ok', (req, res) => {
         }
     }, (error, response, body) => {
         const data = JSON.parse(body)
-        const hash = playbackController.addHost(data.access_token, data.refresh_token)
-        res.redirect(config.frontUri + hash)
+        req.spotishare.access_token = data.access_token
+        req.spotishare.refresh_token = data.refresh_token
+        res.sendStatus(200)
+
+        //const hash = playbackController.addHost(data.access_token, data.refresh_token)
+        //res.redirect(config.frontUri)
     })
 })
+app.use(middlewares.authentication)
+
+app.use('/api/song', song)
 
 app.use(middlewares.notFound)
 app.use(middlewares.errorHandler)
