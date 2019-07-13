@@ -22,7 +22,7 @@ app.use('/api/song', song)
 app.use('/api/search', search)
 
 app.get('/login', (req, res) => {
-    var scopes = 'user-modify-playback-state user-read-playback-state';
+    const scopes = 'user-modify-playback-state user-read-playback-state';
     res.redirect('https://accounts.spotify.com/authorize' +
         '?response_type=code' +
         '&client_id=' + config.clientId +
@@ -41,7 +41,7 @@ app.get('/ok', (req, res) => {
     }, (error, response, body) => {
         const data = JSON.parse(body)
         const hash = playbackController.addHost(data.access_token, data.refresh_token)
-        res.redirect(config.frontUri+hash) 
+        res.redirect(config.frontUri+hash)
     })
 })
 
