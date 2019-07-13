@@ -1,0 +1,20 @@
+{
+  "apps": [
+    {
+      "name": "Spotishare",
+      "script": "./index.js",
+      "watch": true,
+      "ignore_watch": [
+        "node_modules",
+        "combined.log",
+        "error.log"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "output": "~/logs/out.log",
+      "error": "~/logs/error.log",
+      "merge_logs": true
+    }
+  ]
+}
