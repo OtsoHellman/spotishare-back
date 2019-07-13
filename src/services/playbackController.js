@@ -1,4 +1,4 @@
-const { Playback } = require('./playback')
+const { Playback } = require('../services/playback')
 const crypto = require('crypto')
 const activeHosts = []
 

@@ -3,12 +3,13 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const bodyParser = require('body-parser')
-const playbackController = require('./playbackController')
+const playbackController = require('./services/playbackController')
 const middlewares = require('./middlewares')
 const song = require('./api/song')
-const search = require('./api/search')
 const config = require('./config')
 const request = require('request')
+const session = require('client-sessions')
+cookieParser = require('cookie-parser')
 
 const app = express()
 
@@ -16,10 +17,14 @@ app.use(morgan('dev'))
 app.use(cors())
 app.use(helmet())
 app.use(bodyParser.json())
-
+app.use(session({
+    cookieName: 'spotishare',
+    secret: 'lihapulle'
+}))
+app.use(cookieParser())
+app.use(middlewares.authentication)
 
 app.use('/api/song', song)
-app.use('/api/search', search)
 
 app.get('/login', (req, res) => {
     const scopes = 'user-modify-playback-state user-read-playback-state';
@@ -41,7 +46,7 @@ app.get('/ok', (req, res) => {
     }, (error, response, body) => {
         const data = JSON.parse(body)
         const hash = playbackController.addHost(data.access_token, data.refresh_token)
-        res.redirect(config.frontUri+hash)
+        res.redirect(config.frontUri + hash)
     })
 })
 
