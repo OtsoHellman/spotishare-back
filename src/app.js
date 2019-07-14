@@ -64,7 +64,7 @@ app.get('/ok', (req, res) => {
             const data = JSON.parse(body)
             req.spotishare.access_token = data.access_token
             req.spotishare.refresh_token = data.refresh_token
-            res.sendStatus(200)
+            res.redirect(config.frontUri)
         }
     )
 })
