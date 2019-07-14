@@ -1,5 +1,5 @@
 const { SpotifyApi } = require('./spotify')
-const songsService = require('./services/songsService')
+const songsService = require('./songsService')
 
 exports.Playback = class Playback {
     constructor(accessToken, refreshToken, hash) {
