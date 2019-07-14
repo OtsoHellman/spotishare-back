@@ -17,7 +17,7 @@ router.post('/', (req, res) => {
         const hash = playbackController.addHost(req.spotishare.access_token, req.spotishare.refresh_token)
         console.log(hash)
 
-        return res.json({ redirectUri: config.frontUri + hash })
+        return res.json({ hash })
     } catch (error) {
         console.log(error)
 
