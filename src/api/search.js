@@ -1,5 +1,5 @@
 const express = require('express')
-const { getHostByHash } = require('../playbackController')
+const { getHostByHash } = require('../services/playbackController')
 
 const router = express.Router()
 
