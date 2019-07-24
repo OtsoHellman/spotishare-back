@@ -2,7 +2,7 @@ const express = require('express')
 
 const router = express.Router()
 
-const { getHostByHash } = require('../playbackController')
+const { getHostByHash } = require('../services/playbackController')
 
 router.post('/:hash', (req, res) => {
     if (!req.params.hash) {

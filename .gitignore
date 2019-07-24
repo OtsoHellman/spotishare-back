@@ -74,3 +74,6 @@ typings/
 
 # testuser credentials
 .testuser
+
+# IDEA
+.idea

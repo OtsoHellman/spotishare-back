@@ -1,5 +1,5 @@
 const SpotifyWebApi = require('spotify-web-api-node')
-const config = require('./config')
+const config = require('../config')
 
 exports.SpotifyApi = class SpotifyApi {
   constructor(accessToken, refreshToken) {
