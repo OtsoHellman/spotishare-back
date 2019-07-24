@@ -17,17 +17,17 @@ app.use(cors())
 app.use(helmet())
 app.use(bodyParser.json())
 
-
 app.use('/api/song', song)
 app.use('/api/search', search)
 
 app.get('/login', (req, res) => {
-    var scopes = 'user-modify-playback-state user-read-playback-state';
+    const redirectUri = req.query.redirectUri || config.redirectUri
+    const scopes = 'user-modify-playback-state user-read-playback-state';
     res.redirect('https://accounts.spotify.com/authorize' +
         '?response_type=code' +
         '&client_id=' + config.clientId +
         (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +
-        '&redirect_uri=' + encodeURIComponent(config.redirectUri))
+        '&redirect_uri=' + encodeURIComponent(redirectUri))
 })
 
 app.get('/ok', (req, res) => {
