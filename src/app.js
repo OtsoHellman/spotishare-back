@@ -68,7 +68,25 @@ app.get('/ok', (req, res) => {
         }
     )
 })
+
 app.use(middlewares.authentication)
+
+app.get('/api/me', (req, res) => {
+    const token = req.spotishare.access_token
+    if (req.user) {
+        res.json(req.user)
+    } else {
+        request.get({
+            uri: 'https://api.spotify.com/v1/me',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }, (error, response, body) => {
+            const data = JSON.parse(body)
+            res.json(data)
+        })
+    }
+})
 
 app.use('/api/song', song)
 app.use('/api/session', session)
