@@ -8,7 +8,7 @@ exports.addHost = (accessToken, refreshToken) => {
     return hash
 }
 
-exports.getHosts = () => activeHosts.map(host => host.hash)
+exports.getHosts = () => activeHosts
 
 exports.getHostByHash = (hash) => {
     const filteredHosts = activeHosts.filter(host => host.hash === hash)

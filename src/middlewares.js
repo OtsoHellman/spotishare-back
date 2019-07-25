@@ -3,8 +3,6 @@ const request = require('request')
 const config = require('./config')
 
 function notFound(req, res, next) {
-  console.log(res.statusCode)
-  console.log("yliyliyli")
   res.status(404)
   const error = new Error(`🔍 - Not Found - ${req.originalUrl}`)
   next(error)
@@ -40,8 +38,6 @@ function authentication(req, res, next) {
       return next()
     }
 
-    let jsIsSpagetti = false
-
     console.log("check if access token is valid")
     request.get(
       {
@@ -53,6 +49,7 @@ function authentication(req, res, next) {
       (error, response, body) => {
         if (response.statusCode === 200) {
           cache.put(req.spotishare.access_token, true, 900000)
+          req.user = JSON.parse(body)
           return next()
         } else {
 
