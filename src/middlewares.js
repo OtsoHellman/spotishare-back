@@ -8,9 +8,9 @@ function notFound(req, res, next) {
   next(error)
 }
 
-/* eslint-disable no-unused-vars */
+// eslint-disable-next-line no-unused-vars */
 function errorHandler(err, req, res, next) {
-  /* eslint-enable no-unused-vars */
+  console.error(err)
   const statusCode = err.status
     ? err.status
     : res.statusCode !== 200
