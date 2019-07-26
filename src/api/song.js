@@ -8,18 +8,18 @@ router.use(hostHandler)
 router.post('/', async (req, res) => {
     const host = req.sessionHost
     const { songId } = req.body
-    if (!songId || songId.slice(0, 14) !== "spotify:track:") {
-        const { statusCode, body: song } = await host.spotifyApi.getSongById(songId.slice(14))
-        if (statusCode !== 200) {
-            return res.status(400).send('Song id not found')
-        }
-        if (host.songQueue.includes(song)) {
-            return res.status(400).send('Song already in the queue')
-        }
-        return res.json(host.addSong(song))
-    } else {
+    if (!songId) {
         return res.status(400).send('Invalid input')
     }
+    
+    const { statusCode, body: song } = await host.spotifyApi.getSongById(songId)
+    if (statusCode !== 200) {
+        return res.status(400).send('Song id not found')
+    }
+    if (host.songQueue.includes(song)) {
+        return res.status(400).send('Song already in the queue')
+    }
+    return res.json(host.addSong(song))
 })
 
 router.post('/removeNext', (req, res) => {
