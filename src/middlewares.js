@@ -2,6 +2,8 @@ const cache = require('memory-cache')
 const request = require('request')
 const config = require('./config')
 
+const { getHostByHash } = require('./services/playbackController')
+
 function notFound(req, res, next) {
   res.status(404)
   const error = new Error(`🔍 - Not Found - ${req.originalUrl}`)
@@ -26,19 +28,16 @@ function errorHandler(err, req, res, next) {
 
 function authentication(req, res, next) {
   try {
-    console.log("check if access token is included in cookies")
     if (!req.spotishare.access_token) {
       const err = new Error('Not authorized')
       err.status = 400
       return next(err)
     }
 
-    console.log("check if access token in cache")
     if (cache.get(req.spotishare.access_token)) {
       return next()
     }
 
-    console.log("check if access token is valid")
     request.get(
       {
         uri: 'https://api.spotify.com/v1/me',
@@ -52,8 +51,6 @@ function authentication(req, res, next) {
           req.user = JSON.parse(body)
           return next()
         } else {
-
-          console.log("try to request valid access token")
           const authorization = Buffer.from(
             `${config.clientId}:${config.clientSecret}`
           ).toString('base64')
@@ -98,8 +95,22 @@ function authentication(req, res, next) {
   }
 }
 
+function hostHandler(req, res, next) {
+  const session = req.method === 'GET' ? req.query.session : req.body.session
+  if (!session) {
+    return res.status(400).send('Missing session hash')
+  }
+  const host = getHostByHash(session)
+  if (!host) {
+    return res.status(400).send('Invalid hash')
+  }
+  req.sessionHost = host
+  return next()
+}
+
 module.exports = {
   notFound,
   errorHandler,
-  authentication
+  authentication,
+  hostHandler
 }
