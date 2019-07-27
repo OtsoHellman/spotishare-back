@@ -1,18 +1,13 @@
 const express = require('express')
-const { getHostByHash } = require('../services/playbackController')
+const { hostHandler } = require('../middlewares')
 
 const router = express.Router()
 
-router.get('/:hash', (req, res) => {
-    if (!req.params.hash) {
-        return res.status(400).send('Missing hash')
-    }
+router.use(hostHandler)
 
-    const host = getHostByHash(req.params.hash)
 
-    if (!host) {
-        return res.status(400).send('Invalid hash')
-    }
+router.get('/', (req, res) => {
+    const host = req.sessionHost
 
     if (!req.query.searchQuery) {
         return res.status(400).send('Missing query parameter')
