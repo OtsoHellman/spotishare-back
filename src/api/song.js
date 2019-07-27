@@ -45,14 +45,10 @@ router.post('/next', async (req, res) => {
 
 router.get('/', (req, res) => {
     const host = req.sessionHost
-    return res.json(host.songQueue)
-})
-
-router.get('/current', (req, res) => {
-    const host = req.sessionHost
     return res.json({
         song: host.currentSong,
-        progress: host.currentProgress
+        progress: host.currentProgress,
+        queue: host.songQueue
     })
 })
 
