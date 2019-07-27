@@ -14,8 +14,12 @@ router.post('/', async (req, res) => {
     
     const { statusCode, body: song } = await host.spotifyApi.getSongById(songId)
     if (statusCode !== 200) {
-        return res.status(400).send('Song id not found')
+        if (statusCode === 400) {
+            return res.status(400).send('Song id not found')
+        }
+        return res.status(500).send('Something went wrong')
     }
+
     if (host.songQueue.includes(song)) {
         return res.status(400).send('Song already in the queue')
     }
