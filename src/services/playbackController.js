@@ -1,11 +1,16 @@
 const { Playback } = require('./playback')
 const crypto = require('crypto')
-const activeHosts = []
+let activeHosts = []
 
 exports.addHost = (accessToken, refreshToken) => {
     const hash = crypto.randomBytes(10).toString('hex')
     activeHosts.push(new Playback(accessToken, refreshToken, hash))
     return hash
+}
+
+exports.deleteHost = host  => {
+    activeHosts = activeHosts.filter(activeHost => activeHost !== host)
+    host.terminate()
 }
 
 exports.getHosts = () => activeHosts

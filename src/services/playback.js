@@ -17,6 +17,11 @@ exports.Playback = class Playback {
             .catch(err => console.log(err))
     }
 
+    terminate = () => {
+        this.stopInterval()
+        this.spotifyApi.terminate()
+    }
+
     addSong = (song) => {
         this.songQueue.push(song)
     }
@@ -81,6 +86,10 @@ exports.Playback = class Playback {
             }
         }
         interval()
+    }
+
+    stopInterval = () => {
+        this.playbackInterval = false
     }
 }
 

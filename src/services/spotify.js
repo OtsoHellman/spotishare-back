@@ -10,8 +10,14 @@ exports.SpotifyApi = class SpotifyApi {
     })
     this.spotifyWebApi.setAccessToken(accessToken)
     this.spotifyWebApi.setRefreshToken(refreshToken)
-    setInterval(() => this.getNewAccessToken(), 3000000)
+    this.refreshTokenInterval = setInterval(() => this.getNewAccessToken(), 3000000)
   }
+
+  terminate = () =>  {
+    clearInterval(this.refreshTokenInterval)
+    this.spotifyWebApi = null
+  }
+  
   getNewAccessToken = () => {
     this.spotifyWebApi.refreshAccessToken()
       .then(data => {
@@ -20,6 +26,7 @@ exports.SpotifyApi = class SpotifyApi {
       })
       .catch(err => console.log('Could not refresh access token', err))
   }
+  
   searchByQuery = (query) => this.spotifyWebApi.searchTracks(query)
 
   getPlaybackState = () => this.spotifyWebApi.getMyCurrentPlaybackState()
