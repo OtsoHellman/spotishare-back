@@ -11,14 +11,14 @@ router.post('/', async (req, res) => {
     if (!songId || songId.slice(0, 14) !== "spotify:track:") {
         const { statusCode, body: song } = await host.spotifyApi.getSongById(songId.slice(14))
         if (statusCode !== 200) {
-            return res.send('Song id not found', 400)
+            return res.status(400).send('Song id not found')
         }
         if (host.songQueue.includes(song)) {
-            return res.send('Song already in the queue', 400)
+            return res.status(400).send('Song already in the queue')
         }
         return res.json(host.addSong(song))
     } else {
-        return res.send('Invalid input', 400)
+        return res.status(400).send('Invalid input')
     }
 })
 
@@ -27,7 +27,7 @@ router.post('/removeNext', (req, res) => {
     if (host.songQueue.length > 0) {
         return res.json(host.removeNextSong())
     }
-    return res.send('No songs in the list', 400)
+    return res.status(400).send('No songs in the list')
 })
 
 router.post('/next', async (req, res) => {
@@ -36,7 +36,7 @@ router.post('/next', async (req, res) => {
         await host.playNextSong()
         res.send(200)
     }
-    return res.send('No songs in the list', 400)
+    return res.status(400).send('No songs in the list')
 })
 
 router.get('/', (req, res) => {
@@ -55,7 +55,7 @@ router.get('/current', (req, res) => {
 /* needs to be refactored to use class based playback
 router.post('/move', (req, res) => {
    if (!req.params.hash) {
-       return res.send('Missing hash', 400)
+       return res.status(400).send('Missing hash')
    }
 
    const host = getHostByHash(req.params.hash)
@@ -68,11 +68,11 @@ router.post('/move', (req, res) => {
    const songIndex = songQueue.findIndex(songObject => songObject.uri === songId)
 
    if (songIndex === -1) {
-       return res.send('Song not in queue', 400)
+       return res.status(400).send('Song not in queue')
    }
 
    if ((moveUp === true && songIndex <= 0) || (moveUp === false && songIndex >= songQueue.length - 1)) {
-       return res.send('Invalid move', 400)
+       return res.status(400).send('Invalid move')
    }
 
    const nextIndex = moveUp ? songIndex -1 : songIndex + 1
