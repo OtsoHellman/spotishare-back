@@ -16,4 +16,8 @@ router.post('/', (req, res) => {
     res.json({ hash })
 })
 
+router.delete('/', (req, res) => {
+    const session = playbackController.getHostByRefreshToken(req.spotishare.refresh_token)
+    playbackController.deleteHost(session)
+})
 module.exports = router
