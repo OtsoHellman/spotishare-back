@@ -34,7 +34,7 @@ router.post('/next', async (req, res) => {
     const host = req.sessionHost
     if (host.songQueue.length > 0) {
         await host.playNextSong()
-        res.send(200)
+        res.sendStatus(200)
     }
     return res.status(400).send('No songs in the list')
 })
@@ -80,7 +80,7 @@ router.post('/move', (req, res) => {
    songQueue[nextIndex] = songQueue[songIndex]
    songQueue[songIndex] = swapSong
 
-   res.send(200)
+   res.sendStatus(200)
 })*/
 
 module.exports = router
