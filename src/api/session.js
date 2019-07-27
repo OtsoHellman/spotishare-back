@@ -18,6 +18,10 @@ router.post('/', (req, res) => {
 
 router.delete('/', (req, res) => {
     const session = playbackController.getHostByRefreshToken(req.spotishare.refresh_token)
-    playbackController.deleteHost(session)
+    if (session) {
+        playbackController.deleteHost(session)
+        return res.sendStatus(200)
+    }
+    res.status(400).send('No active session for host')
 })
 module.exports = router
