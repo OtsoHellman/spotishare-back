@@ -6,7 +6,7 @@ const { getHostByHash } = require('../services/playbackController')
 
 router.post('/:hash', (req, res) => {
     if (!req.params.hash) {
-        return res.send('Missing hash', 400)
+        return res.status(400).send('Missing hash')
     }
 
     const host = getHostByHash(req.params.hash)
@@ -20,23 +20,23 @@ router.post('/:hash', (req, res) => {
             .then(responseObject => {
                 if (responseObject.statusCode === 200) {
                     if (host.songQueue.includes(responseObject.body)) {
-                        return res.send('Hyvää juhannusta', 418)
+                        return res.status(418).send('Hyvää juhannusta')
                     }
                     return res.json(host.addSong(responseObject.body))
                 } else {
-                    return res.send('Song id not found', 400)
+                    return res.status(400).send('Song id not found')
                 }
             })
             .catch(err => res.send(err))
     } else {
-        return res.send('Invalid input', 400)
+        return res.status(400).send('Invalid input')
     }
 
 })
 
 router.post('/removeNext/:hash', (req, res) => {
     if (!req.params.hash) {
-        return res.send('Missing hash', 400)
+        return res.status(400).send('Missing hash')
     }
 
     const host = getHostByHash(req.params.hash)
@@ -48,12 +48,12 @@ router.post('/removeNext/:hash', (req, res) => {
     if (host.songQueue.length > 0) {
         return res.json(host.removeNextSong())
     }
-    return res.send('Whats the correct status code', 400)
+    return res.status(400).send('Whats the correct status code')
 })
 
 router.post('/next/:hash', (req, res) => {
     if (!req.params.hash) {
-        return res.send('Missing hash', 400)
+        return res.status(400).send('Missing hash')
     }
 
     const host = getHostByHash(req.params.hash)
@@ -66,7 +66,7 @@ router.post('/next/:hash', (req, res) => {
         host.playNextSong()
             .then(res.send(200))
     }
-    return res.send('Whats the correct status code', 400)
+    return res.status(400).send('Whats the correct status code')
 })
 
 router.get('/:hash', (req, res) => {
@@ -105,7 +105,7 @@ router.get('/current/:hash', (req, res) => {
 /* needs to be refactored to use class based playback
 router.post('/move', (req, res) => {
    if (!req.params.hash) {
-       return res.send('Missing hash', 400)
+       return res.status(400).send('Missing hash')
    }
 
    const host = getHostByHash(req.params.hash)
@@ -118,11 +118,11 @@ router.post('/move', (req, res) => {
    const songIndex = songQueue.findIndex(songObject => songObject.uri === songId)
 
    if (songIndex === -1) {
-       return res.send('Song not in queue', 400)
+       return res.status(400).send('Song not in queue')
    }
 
    if ((moveUp === true && songIndex <= 0) || (moveUp === false && songIndex >= songQueue.length - 1)) {
-       return res.send('Invalid move', 400)
+       return res.status(400).send('Invalid move')
    }
 
    const nextIndex = moveUp ? songIndex -1 : songIndex + 1
