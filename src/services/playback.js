@@ -2,18 +2,19 @@ const { SpotifyApi } = require('./spotify')
 const songsService = require('./songsService')
 
 exports.Playback = class Playback {
+    songQueue = []
+    playbackInterval = false
+    currentSong = null
+    currentProgress = 0
+    savedContext = null
+    owner = null
     constructor(accessToken, refreshToken, hash) {
-        this.songQueue = []
-        this.playbackInterval = false
         this.spotifyApi = new SpotifyApi(accessToken, refreshToken)
         this.hash = hash
         this.startInterval()
-        this.currentSong = null
-        this.currentProgress = 0
-        this.savedContext = null
 
         this.spotifyApi.getUserInfo()
-            .then(data => this.hostName = data.body.display_name)
+            .then(data => this.owner = data.body)
             .catch(err => console.log(err))
     }
 
