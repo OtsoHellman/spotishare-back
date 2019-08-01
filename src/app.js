@@ -35,17 +35,20 @@ app.use(cookieParser())
 
 app.get('/login', (req, res) => {
     const scopes = ['user-modify-playback-state', 'user-read-playback-state']
-    const url = spotifyApi.createAuthorizeURL(scopes)
+    const { redirectUrl } = req.query
+    const url = spotifyApi.createAuthorizeURL(scopes, JSON.stringify({ redirectUrl }))
     res.redirect(url)
 })
 
 app.get('/ok', (req, res) => {
-    const { code } = req.query
+    const { code, state: stateAsString } = req.query
+    const state = stateAsString && JSON.parse(stateAsString)
+    const redirectUrl = state && state.redirectUrl || config.frontUri
     spotifyApi.authorizationCodeGrant(code)
         .then(({ body }) => {
             req.spotishare.access_token = body.access_token
             req.spotishare.refresh_token = body.refresh_token
-            res.redirect(config.frontUri)
+            res.redirect(redirectUrl)
         })
 })
 
