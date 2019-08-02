@@ -1,4 +1,4 @@
-const { SpotifyApi } = require('./spotify')
+const { SpotifyApi } = require('./spotifyApi')
 const songsService = require('./songsService')
 
 exports.Playback = class Playback {
