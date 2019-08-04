@@ -1,6 +1,5 @@
 const cache = require('memory-cache')
-const request = require('request')
-const config = require('./config')
+const getSpotify = require('./services/spotify')
 
 const { getHostByHash } = require('./services/playbackController')
 
@@ -25,71 +24,45 @@ function errorHandler(err, req, res, next) {
   })
 }
 
+const FIFTEEN_MINUTES = 15 * 60 * 1000
 
 function authentication(req, res, next) {
   try {
-    if (!req.spotishare.access_token) {
+    const accessToken = req.spotishare.access_token
+    const refreshToken = req.spotishare.refresh_token
+    if (!accessToken) {
       const err = new Error('Not authorized')
       err.status = 400
       return next(err)
     }
 
-    if (cache.get(req.spotishare.access_token)) {
+    if (cache.get(accessToken)) {
       return next()
     }
 
-    request.get(
-      {
-        uri: 'https://api.spotify.com/v1/me',
-        headers: {
-          Authorization: `Bearer ${req.spotishare.access_token}`
-        }
-      },
-      (error, response, body) => {
-        if (response.statusCode === 200) {
-          cache.put(req.spotishare.access_token, true, 900000)
-          req.user = JSON.parse(body)
-          return next()
-        } else {
-          const authorization = Buffer.from(
-            `${config.clientId}:${config.clientSecret}`
-          ).toString('base64')
+    const onRes = ({ body }) => {
+        cache.put(accessToken, true, FIFTEEN_MINUTES)
+        req.user = body
+        return next()
+    }
 
-          request.post(
-            {
-              uri: 'https://accounts.spotify.com/api/token',
-              headers: {
-                Authorization: `Basic ${authorization}`
-              },
-              form: {
-                grant_type: 'refresh_token',
-                refresh_token: req.spotishare.refresh_token
-              }
-            },
-            (error, response, body) => {
-              if (error) {
-                console.log(error)
-                const err = new Error('Failed to request new access token')
-                err.status = 400
-                return next(err)
-              }
-              const data = body && JSON.parse(body)
-              if (data.access_token) {
-                console.log(data.access_token)
-                cache.put(data.access_token, true, 900000)
-                req.spotishare.access_token = data.access_token
-                return next()
-              } else {
-                const err = new Error('Failed to request new access token')
-                err.status = 400
-                return next(err)
-              }
-            }
-          )
-        }
-      }
-    )
-
+    const s = getSpotify({
+      accessToken,
+      refreshToken
+    })
+    const t = () => new Promise((r, s) => s(new Error()))
+    t()
+        .then(onRes)
+        .catch(() => {
+          return s.refreshAccessToken()
+        })
+        .then(onRes)
+        .catch(error => {
+          console.error(error)
+          const err = new Error('Failed to request new access token')
+          err.status = 400
+          return next(err)
+        })
   } catch (error) {
     return next(error)
   }
