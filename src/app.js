@@ -28,7 +28,7 @@ app.use(bodyParser.json())
 app.use(
     clientSession({
         cookieName: 'spotishare',
-        secret: 'lihapulle',
+        secret: config.cookieSecret,
     }),
 )
 app.use(cookieParser())
