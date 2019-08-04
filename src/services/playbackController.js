@@ -9,8 +9,8 @@ exports.addHost = (accessToken, refreshToken) => {
 }
 
 exports.deleteHost = host  => {
-    activeHosts = activeHosts.filter(activeHost => activeHost !== host)
     host.terminate()
+    activeHosts = activeHosts.filter(activeHost => activeHost !== host)
 }
 
 exports.getHosts = () => activeHosts
