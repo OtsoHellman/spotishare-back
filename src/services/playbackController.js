@@ -1,6 +1,6 @@
 const { Playback } = require('./playback')
 const crypto = require('crypto')
-const activeHosts = []
+let activeHosts = []
 
 exports.addHost = (accessToken, refreshToken) => {
     const hash = crypto.randomBytes(10).toString('hex')
@@ -8,9 +8,16 @@ exports.addHost = (accessToken, refreshToken) => {
     return hash
 }
 
+exports.deleteHost = host  => {
+    host.terminate()
+    activeHosts = activeHosts.filter(activeHost => activeHost !== host)
+}
+
 exports.getHosts = () => activeHosts
 
-exports.getHostByHash = (hash) => {
+exports.getHostByHash = hash => {
     const filteredHosts = activeHosts.filter(host => host.hash === hash)
     return filteredHosts.length > 0 ? filteredHosts[0] : null
 }
+
+exports.getHostByRefreshToken = token => activeHosts.find(host => host.spotifyApi.spotifyWebApi.getRefreshToken() === token) || null
