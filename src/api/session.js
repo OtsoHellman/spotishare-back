@@ -8,6 +8,12 @@ router.get('/', (req, res) => {
     res.json(session)
 })
 
+router.get('/:hash', (req, res) => {
+    const { hash } = req.params
+    const session = playbackController.getHostByHash(hash)
+    res.json(session || null)
+})
+
 router.post('/', (req, res) => {
     if (playbackController.getHostByRefreshToken(req.spotishare.refresh_token)) {
         return res.status(400).send('Active session already exists for host')
