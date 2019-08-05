@@ -70,6 +70,8 @@ exports.Playback = class Playback {
                     return this.playNextSong()
                 }
                 if (!res.body.context && this.savedContext) {
+                    // Play saved context only once
+                    this.savedContext = null
                     return this.playSavedContext()
                 }
             }
