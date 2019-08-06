@@ -8,84 +8,60 @@ const song = require('./api/song')
 const search = require('./api/search')
 const session = require('./api/session')
 const config = require('./config')
-const request = require('request')
 const clientSession = require('client-sessions')
+const getSpotify = require('./services/spotify')
 cookieParser = require('cookie-parser')
 
 const app = express()
+
+const spotifyApi = getSpotify()
 
 app.use(morgan('dev'))
 app.use(
     cors({
         origin: config.frontUri,
-        credentials: true
-    })
+        credentials: true,
+    }),
 )
 app.use(helmet())
 app.use(bodyParser.json())
 app.use(
     clientSession({
         cookieName: 'spotishare',
-        secret: 'lihapulle'
-    })
+        secret: config.cookieSecret,
+    }),
 )
 app.use(cookieParser())
 
 app.get('/login', (req, res) => {
-    var scopes = 'user-modify-playback-state user-read-playback-state'
-    res.redirect(
-        'https://accounts.spotify.com/authorize' +
-        '?response_type=code' +
-        '&client_id=' +
-        config.clientId +
-        (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +
-        '&redirect_uri=' +
-        encodeURIComponent(config.redirectUri)
-    )
+    const scopes = ['user-modify-playback-state', 'user-read-playback-state']
+    const { redirectUrl } = req.query
+    const url = spotifyApi.createAuthorizeURL(scopes, JSON.stringify({ redirectUrl }))
+    res.redirect(url)
 })
 
 app.get('/ok', (req, res) => {
-    const authorization = Buffer.from(
-        `${config.clientId}:${config.clientSecret}`
-    ).toString('base64')
-    request.post(
-        {
-            uri: 'https://accounts.spotify.com/api/token',
-            form: {
-                code: req.query.code,
-                grant_type: 'authorization_code',
-                redirect_uri: config.redirectUri
-            },
-            headers: {
-                Authorization: `Basic ${authorization}`
-            }
-        },
-        (error, response, body) => {
-            const data = JSON.parse(body)
-            req.spotishare.access_token = data.access_token
-            req.spotishare.refresh_token = data.refresh_token
-            res.redirect(config.frontUri)
-        }
-    )
+    const { code, state: stateAsString } = req.query
+    const state = stateAsString && JSON.parse(stateAsString)
+    const redirectUrl = state && state.redirectUrl || config.frontUri
+    spotifyApi.authorizationCodeGrant(code)
+        .then(({ body }) => {
+            req.spotishare.access_token = body.access_token
+            req.spotishare.refresh_token = body.refresh_token
+            res.redirect(redirectUrl)
+        })
 })
 
 app.use(middlewares.authentication)
 
 app.get('/api/me', (req, res) => {
     const token = req.spotishare.access_token
-    if (req.user) {
-        res.json(req.user)
-    } else {
-        request.get({
-            uri: 'https://api.spotify.com/v1/me',
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }, (error, response, body) => {
-            const data = JSON.parse(body)
-            res.json(data)
-        })
-    }
+    const s = getSpotify({
+        accessToken: token,
+    })
+    s.getMe().then(({ body }) => {
+        res.json(body)
+    })
 })
 
 app.use('/api/song', song)
