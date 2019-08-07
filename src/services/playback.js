@@ -44,7 +44,6 @@ exports.Playback = class Playback {
 
     playSavedContext = () => {
         console.log("Playing by saved context")
-        console.log(this.savedContext)
         return this.spotifyApi.setShuffle()
             .then(this.spotifyApi.playSongByContext(this.savedContext))
             .then(() => new Promise(resolve => setTimeout(resolve, 3000)))
@@ -70,9 +69,11 @@ exports.Playback = class Playback {
                     return this.playNextSong()
                 }
                 if (!res.body.context && this.savedContext) {
-                    // Play saved context only once
-                    this.savedContext = null
                     return this.playSavedContext()
+                        .then(() => {
+                            // Play saved context only once
+                            this.savedContext = null
+                        })
                 }
             }
         })
