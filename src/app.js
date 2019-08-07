@@ -9,7 +9,7 @@ const search = require('./api/search')
 const session = require('./api/session')
 const config = require('./config')
 const clientSession = require('client-sessions')
-const getSpotify = require('./services/spotify')
+const { getSpotify, getMe } = require('./services/spotify')
 cookieParser = require('cookie-parser')
 
 const app = express()
@@ -40,32 +40,33 @@ app.get('/login', (req, res) => {
     res.redirect(url)
 })
 
-app.get('/ok', (req, res) => {
+app.get('/ok', (req, res, next) => {
     const { code, state: stateAsString } = req.query
     const state = stateAsString && JSON.parse(stateAsString)
     const redirectUrl = state && state.redirectUrl || config.frontUri
     spotifyApi.authorizationCodeGrant(code)
-        .then(({ body }) => {
-            req.spotishare.access_token = body.access_token
-            req.spotishare.refresh_token = body.refresh_token
+        .then(({ body, headers }) => {
+            const now = new Date(headers.date).getTime()
+            const expirationTimestampMs = now + body.expires_in * 1000
+            req.spotishare.accessToken = body.access_token
+            req.spotishare.refreshToken = body.refresh_token
+            req.spotishare.expirationTime = expirationTimestampMs
+            return getMe(body.access_token)
+        })
+        .then(({ id }) => {
+            req.spotishare.userId = id
             res.redirect(redirectUrl)
         })
+        .catch(next)
 })
 
 app.use(middlewares.authentication)
 
 app.get('/api/me', (req, res, next) => {
-    const token = req.spotishare.access_token
-    const s = getSpotify({
-        accessToken: token,
-    })
-    s.getMe()
-        .then(({ body }) => {
-            res.json(body)
-        })
-        .catch((err) => {
-            next(err)
-        })
+    const token = req.spotishare.accessToken
+    getMe(token)
+        .then((me) => res.json(me))
+        .catch(next)
 })
 
 app.use('/api/song', song)

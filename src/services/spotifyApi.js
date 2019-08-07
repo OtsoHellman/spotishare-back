@@ -1,4 +1,4 @@
-const getSpotify = require('./spotify')
+const { getSpotify } = require('./spotify')
 
 const FIFTY_MINUTES = 50 * 60 * 1000
 
