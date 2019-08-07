@@ -40,28 +40,29 @@ function authentication(req, res, next) {
       return next()
     }
 
-    const onRes = ({ body }) => {
-        cache.put(accessToken, true, FIFTEEN_MINUTES)
-        req.user = body
-        return next()
-    }
-
     const s = getSpotify({
       accessToken,
       refreshToken
     })
-    const t = () => new Promise((r, s) => s(new Error()))
-    t()
-        .then(onRes)
-        .catch(() => {
-          return s.refreshAccessToken()
+
+    s.getMe()
+        .then(() => {
+          req.user = body
+          next()
         })
-        .then(onRes)
-        .catch(error => {
-          console.error(error)
-          const err = new Error('Failed to request new access token')
-          err.status = 400
-          return next(err)
+        .catch(() => {
+          s.refreshAccessToken()
+              .then(({ body: { access_token } }) => {
+                req.spotishare.access_token = access_token
+                cache.put(access_token, true, FIFTEEN_MINUTES)
+                return next()
+              })
+              .catch(error => {
+                console.error(error)
+                const err = new Error('Failed to request new access token')
+                err.status = 400
+                return next(err)
+              })
         })
   } catch (error) {
     return next(error)
