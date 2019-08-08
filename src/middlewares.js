@@ -1,5 +1,4 @@
-const cache = require('memory-cache')
-const getSpotify = require('./services/spotify')
+const { getSpotify } = require('./services/spotify')
 
 const { getHostByHash } = require('./services/playbackController')
 
@@ -24,48 +23,34 @@ function errorHandler(err, req, res, next) {
   })
 }
 
-const FIFTEEN_MINUTES = 15 * 60 * 1000
+async function authentication(req, res, next) {
+  const { accessToken, refreshToken, expirationTime } = req.spotishare
 
-function authentication(req, res, next) {
+  if (!accessToken) {
+    const err = new Error('Not authorized')
+    err.status = 400
+    return next(err)
+  }
+
+  // Hasn't expired
+  if (new Date(expirationTime) > new Date()) {
+    return next()
+  }
+
+  const s = getSpotify({
+    accessToken,
+    refreshToken
+  })
+
   try {
-    const accessToken = req.spotishare.access_token
-    const refreshToken = req.spotishare.refresh_token
-    if (!accessToken) {
-      const err = new Error('Not authorized')
-      err.status = 400
-      return next(err)
-    }
-
-    if (cache.get(accessToken)) {
-      return next()
-    }
-
-    const s = getSpotify({
-      accessToken,
-      refreshToken
-    })
-
-    s.getMe()
-        .then(() => {
-          req.user = body
-          next()
-        })
-        .catch(() => {
-          s.refreshAccessToken()
-              .then(({ body: { access_token } }) => {
-                req.spotishare.access_token = access_token
-                cache.put(access_token, true, FIFTEEN_MINUTES)
-                return next()
-              })
-              .catch(error => {
-                console.error(error)
-                const err = new Error('Failed to request new access token')
-                err.status = 400
-                return next(err)
-              })
-        })
+    const { body: { access_token } } = await s.refreshAccessToken()
+    req.spotishare.accessToken = access_token
+    next()
   } catch (error) {
-    return next(error)
+    console.error(error)
+    const err = new Error('Failed to request new access token')
+    err.status = 400
+    return next(err)
   }
 }
 

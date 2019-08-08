@@ -1,4 +1,5 @@
 const { SpotifyApi } = require('./spotifyApi')
+const { getMe } = require('./spotify')
 const songsService = require('./songsService')
 
 exports.Playback = class Playback {
@@ -8,14 +9,23 @@ exports.Playback = class Playback {
     currentProgress = 0
     savedContext = null
     owner = null
-    constructor(accessToken, refreshToken, hash) {
+    constructor(accessToken, refreshToken, hash, userId) {
         this.spotifyApi = new SpotifyApi(accessToken, refreshToken)
         this.hash = hash
+        this.owner = {
+            id: userId
+        }
         this.startInterval()
+    }
 
-        this.spotifyApi.getUserInfo()
-            .then(data => this.owner = data.body)
-            .catch(err => console.log(err))
+    initOwner = () => {
+        return getMe(this.spotifyApi)
+            .then(me => {
+                this.owner = {
+                    ...this.owner,
+                    ...me,
+                }
+            })
     }
 
     terminate = () => {
