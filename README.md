@@ -1,3 +1,5 @@
+See: https://github.com/OREOA/spotishare-front
+
 # Spotishare backend
 
 [![Build Status](https://travis-ci.org/OREOA/spotishare-back.svg?branch=master)](https://travis-ci.org/OREOA/spotishare-back)
