@@ -42,7 +42,7 @@
     "morgan": "^1.9.1",
     "pg": "^7.12.0",
     "request": "^2.88.0",
-    "sequelize": "^5.10.0",
+    "sequelize": "^6.29.0",
     "spotify-web-api-node": "^4.0.0"
   },
   "devDependencies": {
